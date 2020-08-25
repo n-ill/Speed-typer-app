@@ -13,6 +13,12 @@ class MyWindow(QMainWindow):
         self.setFixedSize(600,500)
         self.setWindowTitle("Speed Typer Test")
 
+        self.wpm = 0
+
+        self.wpm_label = QLabel(self)
+        self.wpm_label.setGeometry(200, 400, 100, 30)
+        self.wpm_label.setStyleSheet("border : 2px solid black; font-size: 22px;")
+
         self.label = QLabel(self)
         self.label.setGeometry(25,5,550,300)
         self.label.setWordWrap(True)
@@ -76,6 +82,7 @@ class MyWindow(QMainWindow):
         self.timer_label.setText("")
         self.counter_label.setText("")
         self.counter_label.setStyleSheet("border : 2px solid black; font-size: 18px;")
+        self.wpm_label.setText("   wpm")
 
 
     def countdown(self):
@@ -114,17 +121,30 @@ class MyWindow(QMainWindow):
 
     def check_input(self):
         if self.input_start:
-            if self.user_input.text() == (self.quote_word_list[self.current_word_index] + ' '):
-                self.user_input.clear()
-                self.current_word_index += 1
-                self.highlight_curr_word()
+            if self.current_word_index < len(self.quote_word_list)-1:
+                if self.user_input.text() == (self.quote_word_list[self.current_word_index] + ' '):
+                    self.user_input.clear()
+                    self.current_word_index += 1
+                    self.highlight_curr_word()
+            else: #### Makes it so you don't need to press space after the final word
+                if self.user_input.text() == (self.quote_word_list[self.current_word_index]):
+                    self.user_input.clear()
+                    self.current_word_index += 1
+                    self.highlight_curr_word()
             if self.current_word_index == len(self.quote_word_list):
                 self.timer_start = False
+                self.input_start = False
+                self.wpm_calculator()
+                self.wpm_label.setText(str(self.wpm) + ' wpm')
+
 
     def wpm_timer(self):
         if self.timer_start:
             self.total_time += 0.001
             self.timer_label.setText(str(round(self.total_time,3)) + 's')
+
+    def wpm_calculator(self):
+        self.wpm = int((len(self.current_quote) / 5) / (self.total_time / 60))
 
 
 def get_quotes_list():
@@ -139,8 +159,3 @@ win = MyWindow()
 
 win.show()
 sys.exit(app.exec_())
-
-#TO DO:
-#Wpm that updates as you type --- maybe or once finished
-#accuracy %
-#last word in quote not being checked properly
