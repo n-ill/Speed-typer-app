@@ -18,22 +18,21 @@ class MyWindow(QMainWindow):
         self.label.setWordWrap(True)
         self.label.setStyleSheet("border : 2px solid black; font-size: 18px;")
 
-        self.quote_list = get_quotes_list()
-        self.current_quote = ""
-        self.current_word_index = 0  # need to update this <<<<<<
-        self.random_quote()  # set current_quote
-        self.quote_word_list = self.current_quote.split(' ')
-
-        self.counter_label = QLabel(self)
-        self.counter_label.setGeometry(325,310,50,30)
-        self.counter_label.setAlignment(QtCore.Qt.AlignCenter)
-        self.counter_label.setStyleSheet("border : 2px solid black; font-size: 18px;")
-
         self.timer_label = QLabel(self)
         self.timer_label.setGeometry(200, 310, 100, 30)
         self.timer_label.setAlignment(QtCore.Qt.AlignCenter)
         self.timer_label.setStyleSheet("border : 2px solid black; font-size: 12px;")
 
+        self.counter_label = QLabel(self)
+        self.counter_label.setGeometry(325, 310, 50, 30)
+        self.counter_label.setAlignment(QtCore.Qt.AlignCenter)
+        #self.counter_label.setStyleSheet("border : 2px solid black; font-size: 18px;")
+
+        self.quote_list = get_quotes_list()
+        self.current_quote = ""
+        self.current_word_index = 0  # need to update this <<<<<<
+        self.random_quote()  # set current_quote
+        self.quote_word_list = self.current_quote.split(' ')
 
         self.random_button = QPushButton(self)
         self.random_button.clicked.connect(self.random_quote)
@@ -67,12 +66,17 @@ class MyWindow(QMainWindow):
         self.user_input.textChanged.connect(self.check_input)
 
     def random_quote(self):
-        #self.current_word_index = 0
+        self.current_word_index = 0
         rand_quote = random.choice(self.quote_list)
         self.label.setText(rand_quote)
         self.current_quote = rand_quote
         self.quote_word_list = self.current_quote.split(' ')
         self.highlight_curr_word()
+        self.total_time = 0
+        self.timer_label.setText("")
+        self.counter_label.setText("")
+        self.counter_label.setStyleSheet("border : 2px solid black; font-size: 18px;")
+
 
     def countdown(self):
         if self.start:
@@ -101,9 +105,12 @@ class MyWindow(QMainWindow):
 
     def highlight_curr_word(self):
         list = self.current_quote.split(' ')
-        self.label.setText(' '.join(list[0:self.current_word_index]) + ' ' +
-                           f'<span style="background-color:#C6C2C1 ;">{list[self.current_word_index]}</span>'
-                           + ' ' + ' '.join(list[self.current_word_index+1:]))
+        if self.current_word_index < len(self.quote_word_list):
+            self.label.setText(' '.join(list[0:self.current_word_index]) + ' ' +
+                               f'<span style="background-color:#C6C2C1 ;">{list[self.current_word_index]}</span>'
+                               + ' ' + ' '.join(list[self.current_word_index+1:]))
+        else:
+            self.label.setText(self.current_quote)
 
     def check_input(self):
         if self.input_start:
@@ -121,11 +128,8 @@ class MyWindow(QMainWindow):
 
 
 def get_quotes_list():
-    list = []
-
     with open('quotes_fixed.txt', 'r') as file:
-        for line in file:
-            list.append(line)
+        list = file.read().split('\n')
 
     return list
 
