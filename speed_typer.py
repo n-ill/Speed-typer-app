@@ -63,13 +63,15 @@ class MyWindow(QMainWindow):
         self.timer.start(1)
 
         self.highlight_curr_word()
+        self.input_start = False
         self.user_input.textChanged.connect(self.check_input)
 
     def random_quote(self):
-        self.current_word_index = 0
+        #self.current_word_index = 0
         rand_quote = random.choice(self.quote_list)
         self.label.setText(rand_quote)
         self.current_quote = rand_quote
+        self.quote_word_list = self.current_quote.split(' ')
         self.highlight_curr_word()
 
     def countdown(self):
@@ -80,7 +82,7 @@ class MyWindow(QMainWindow):
             if self.count == -1: #when countdown ends
                 self.start = False
                 self.timer_start = True
-                #self.input_start = True
+                self.input_start = True
                 self.user_input.clear()
                 self.counter_label.setText('GO')
                 self.counter_label.setStyleSheet("background-color:green;")
@@ -104,10 +106,13 @@ class MyWindow(QMainWindow):
                            + ' ' + ' '.join(list[self.current_word_index+1:]))
 
     def check_input(self):
-        if self.user_input.text() == (self.quote_word_list[self.current_word_index] + ' '):
-            self.user_input.clear()
-            self.current_word_index += 1
-            self.highlight_curr_word()
+        if self.input_start:
+            if self.user_input.text() == (self.quote_word_list[self.current_word_index] + ' '):
+                self.user_input.clear()
+                self.current_word_index += 1
+                self.highlight_curr_word()
+            if self.current_word_index == len(self.quote_word_list):
+                self.timer_start = False
 
     def wpm_timer(self):
         if self.timer_start:
@@ -134,3 +139,4 @@ sys.exit(app.exec_())
 #TO DO:
 #Wpm that updates as you type --- maybe or once finished
 #accuracy %
+#last word in quote not being checked properly
